@@ -1,3 +1,7 @@
+# Folders
+pico-sdk
+build
+
 # Prerequisites
 *.d
 
