@@ -1,4 +1,5 @@
 
+#include "hardware/adc.h"
 #include "hardware/gpio.h"
 #include "lib/energymetter.h"
 #include "pico.h"
@@ -7,6 +8,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
+#include "pin_defines.h"
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
@@ -44,30 +46,39 @@ int main()
 
     /* Initialise I/O */
     stdio_init_all();
-    busy_wait_ms(1000);
 
     /* Initialise Second core with Serial in Scan*/
     multicore_launch_core1(serialInput);
-    busy_wait_ms(1000);
 
-    const uint8_t led_pin = 25;
+    /* LED */
+    gpio_init(pin_led_1Hz);
+    gpio_set_dir(pin_led_1Hz, OUTPUT);
 
-    gpio_init(led_pin);
-    gpio_set_dir(led_pin, 1);
+    gpio_put(pin_led_1Hz, 0);
 
     bool led_state = false;
 
-    uint32_t cnt = 0;
+    /* ANALOG */
+    adc_init();
+    adc_gpio_init(30);
+    adc_select_input(4);
+    adc_set_temp_sensor_enabled(1);
+
     while (1)
     {
         // Update Energy Values
         contador.Update();
 
         // Print
-        std::cout << "Ola Frederico " << cnt++ << std::endl;
+        int temp_adc = adc_read();
+        float temp_volt = temp_adc * (3.3f / 4096.0f);
+        int temp = 27 - (temp_volt - 0.706) / 0.001721;
+
+        std::cout << "ADC: " << temp_adc << "   Voltagem: " << temp_volt << "V   Temperatura: " << temp << "ºC"
+                  << std::endl;
 
         // Toogle Led
-        gpio_put(led_pin, led_state);
+        gpio_put(pin_led_1Hz, led_state);
         led_state = !led_state;
 
         // Delay
