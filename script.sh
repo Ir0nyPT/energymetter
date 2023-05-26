@@ -102,9 +102,9 @@ debug()
 
         if [ ! -z $searchRapsSerial ]; then
             clear;
-            echo "$(yellowprint '* MINICOM -> Press CTRL+A X to exit *')"
+            echo "$(yellowprint '* PICOCOM -> Press CTRL+A X to exit *')"
             sleep 2
-            minicom -b 115200 -o -D /dev/ttyACM0;
+            sudo picocom -b 115200 /dev/ttyACM0;
         else
             echo "$(redprint 'FAIL') Raspberry not ready to print"
         fi
