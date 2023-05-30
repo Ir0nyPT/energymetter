@@ -69,7 +69,10 @@ runBuild()
         cmake -B build -S .
     fi
 
-    make -C build -j12
+    # Get Number os CPU
+    cpu_num=$(lscpu | grep "Core(s) per socket" | cut -d ':' -f2 | xargs)
+    # Build
+    make -C build -j$cpu_num
 }
 
 copyToPico()
