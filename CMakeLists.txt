@@ -1,7 +1,9 @@
 # Generated Cmake Pico project file
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_C_STANDARD 17)
+set(PICO_BOARD pico_w)
+
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
@@ -36,11 +38,14 @@ target_link_libraries(energymetter
   hardware_rtc
   hardware_timer
   hardware_uart
+  # pico_cyw43_arch_none
+  pico_cyw43_arch_lwip_poll
 )
 
 # Add any user requested libraries
 target_link_libraries(energymetter lib)
 
+target_include_directories(energymetter PRIVATE ${CMAKE_CURRENT_LIST_DIR} )
 
 target_compile_options(energymetter PRIVATE
   -O3
