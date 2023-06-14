@@ -4,9 +4,11 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 
+
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico-sdk/pico_sdk_init.cmake)
 include(pico-sdk/external/pico_sdk_import.cmake)
+set(PICO_BOARD pico_w)
 
 project(energymetter C CXX ASM)
 
@@ -36,6 +38,7 @@ target_link_libraries(energymetter
   hardware_rtc
   hardware_timer
   hardware_uart
+  pico_cyw43_arch_none
 )
 
 # Add any user requested libraries

@@ -71,3 +71,9 @@ Para enviar para o github de forma a partilhar
 # Como atualizar com as alterações online?
 Desta forma iras obter alterações que outros tenham feito
 > git pull 
+
+
+
+
+# Pico W LED
+https://github.com/raspberrypi/pico-examples/blob/master/pico_w/wifi/blink/picow_blink.c
