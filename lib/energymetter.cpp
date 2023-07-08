@@ -24,9 +24,11 @@ void energymetter::Update()
     // 2º Verificar se iniciou um novo periodo
     if (tensao <= 0 && tensao_anterior > 0)
     {
-        periodo = cnt * 200;
-
+        // Periodo do ciclo que decorreu
+        periodo_ms = cnt * 2 / 10;
         cnt = 0;
+
+        // Tensão máximo do ciclo qie decorreu
         if (tensao_max > 750)
         {
             tensao_rms_ = static_cast<float>(tensao_max) * ganho_fase;

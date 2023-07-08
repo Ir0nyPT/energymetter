@@ -1,6 +1,7 @@
 
 #include "hardware/adc.h"
 #include <iostream>
+#include <string>
 #define pin_to_adc_channel(pin) (pin - 26)
 
 #define ganho_fase 0.12695
@@ -13,9 +14,9 @@ class energymetter
     void Update();
 
     float GetVoltage_RMS() { return tensao_rms_; }
-    float GetCurrent();
+    float GetCurrent() { return corrente_; }
     float GetPowerFactor();
-    uint8_t GetFrequency() { return 1 / periodo; }
+    uint8_t GetFrequency() { return 1000 / periodo_ms; }
 
     float potencia_inst();
 
@@ -26,7 +27,7 @@ class energymetter
     float tensao_rms_{0.0f};
     float corrente_{0.0f};
     float fp_{1.0f};
-    uint16_t periodo{0};
+    uint16_t periodo_ms{0};
 
     int16_t tensao_max{0};
     int16_t tensao_anterior{0};

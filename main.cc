@@ -6,38 +6,78 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
+#include "pin_defines.h"
 #include <stdio.h>
 
 #include "lib/core1.h"
 #include "lib/energymetter.h"
 
-int main()
+#define timer_sync_us 200
+#define timer_sync_us_adjust -3
+
+volatile bool flag_timer{false};
+
+static bool timer_IRQ(struct repeating_timer* t)
+{
+    /* Flag Timer */
+    flag_timer = true;
+
+    return true;
+}
+
+void init()
 {
     /* Initialise I/O */
     stdio_init_all();
+
+    /* Status PIN */
+    gpio_init(pin_led_1Hz);
+    gpio_set_dir(pin_led_1Hz, 1);
+
+    /* Timer Interrupt */
+    static struct repeating_timer timerClock;
+    add_repeating_timer_us(timer_sync_us + timer_sync_us_adjust, timer_IRQ, NULL, &timerClock);
 
     /* Initialise Second core with Serial in Scan*/
     multicore_launch_core1(serialInput);
 
     /* Inicializar módulo WIFI */
     // cyw43_arch_init();
+}
 
-    /* Status PIN */
-    const uint8_t led_pin = 18;
-    gpio_init(led_pin);
-    gpio_set_dir(led_pin, 1);
+int main()
+{
+    init();
 
     energymetter contador_energia;
 
+    bool led_state = false;
+    uint16_t cnt = 0;
+
     while (1)
     {
-        // Toogle Led
-        // gpio_put(led_pin, led_state); //so aqui altera o estado
-        // led_state =! led_state; //guarda so o estado
+        /* Trigger pelo timer (200 us) */
+        if (flag_timer)
+        {
+            /* Analisa Energia */
+            contador_energia.Update();
 
-        contador_energia.Update();
-        sleep_us(100);
+            /* Led 1 Hz (500 ms) */
+            if (cnt >= 2500)
+            {
+                gpio_put(pin_led_1Hz, led_state);  // so aqui altera o estado
+                led_state = !led_state;            // guarda so o estado
+                cnt = 0;
+            }
+            else
+            {
+                cnt++;
+            }
 
+            flag_timer = false;
+        }
+
+        /* Serial */
         if (multicore_fifo_rvalid())
         {
             uint32_t cmd = multicore_fifo_pop_blocking();
